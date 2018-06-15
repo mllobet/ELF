@@ -35,7 +35,7 @@ class SnakeGame {
     std::unique_ptr<SnakeGameEngine> _snake;
 
     int _width, _height;
-    std::vector<Direction> _action_set;
+    std::vector<Action> _action_set;
 
     // Used to dump the current frame.
     // h * w * (not 3 [RGB] may change to one hot in the futre?)
@@ -73,7 +73,7 @@ class SnakeGame {
     void MainLoop(const std::atomic_bool& done);
 
     int num_actions() const { return _action_set.size(); }
-    const std::vector<Direction>& action_set() const { return _action_set; }
+    const std::vector<Action>& action_set() const { return _action_set; }
     int width() const { return _width; }
     int height() const { return _height; }
     const SnakeGameSummary &summary() const { return _summary; }

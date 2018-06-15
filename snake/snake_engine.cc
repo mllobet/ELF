@@ -11,11 +11,11 @@
 #include <ctime>
 #include <cassert>
 
-char EMPTY_TILE = '-';
-char FRUIT_TILE = '#';
+unsigned char EMPTY_TILE = 1;
+unsigned char FRUIT_TILE = 2;
 
-int FRUIT_POINTS = 1;
-int FRUIT_EXTRA_LENGTH = 3;
+float FRUIT_POINTS = 1.0;
+int FRUIT_EXTRA_LENGTH = 1;
 
 int dx[] = {0,0,0,-1,1};
 int dy[] = {0,1,-1,0,0};
@@ -45,9 +45,9 @@ SnakeGameEngine::SnakeGameEngine(int height, int width, int n_snakes, int seed) 
 }
 
 void SnakeGameEngine::setup_game() {
-  _board = std::vector<std::vector<char>>(_height, std::vector<char>(_width, EMPTY_TILE));
+  _board = std::vector<std::vector<unsigned char>>(_height, std::vector<unsigned char>(_width, EMPTY_TILE));
   _snakes = std::vector<Snake>(_n_snakes);
-  _scores = std::vector<int>(_n_snakes, 0);
+  _rewards = std::vector<float>(_n_snakes, 0);
 
   // select random snake positions and store on board
   std::vector<unsigned int> indices(_height*_width);
@@ -60,7 +60,7 @@ void SnakeGameEngine::setup_game() {
     int y = int(indices[i]/_width);
 
     _snakes[i] = Snake(x,y);
-    _board[y][x] = char('0' + 2*i);
+    _board[y][x] = char(2*i);
   }
 
   // add random fruit
@@ -110,16 +110,16 @@ void SnakeGameEngine::reset(){
   setup_game();
 }
 
-std::vector<std::vector<char>> SnakeGameEngine::get_board() {
+std::vector<std::vector<unsigned char>> SnakeGameEngine::get_board() {
   return _board;
 }
 
-std::vector<Direction> SnakeGameEngine::get_minimal_action_set(){
-  std::vector<Direction> dirs = {Up, Down, Right, Left};
+std::vector<Action> SnakeGameEngine::get_minimal_action_set(){
+  std::vector<Action> dirs = {NO_OP, RIGHT, LEFT};
   return dirs;
 }
 
-const std::vector<std::vector<char>>& SnakeGameEngine::get_state(){
+const std::vector<std::vector<unsigned char>>& SnakeGameEngine::get_state(){
   return _board;
 }
 
@@ -134,21 +134,54 @@ void SnakeGameEngine::get_state_array(std::vector<unsigned char> &dest){
   }
 }
 
+Direction SnakeGameEngine::direction_from_action(int snake_idx, Action a) {
+  Direction d = _snakes[snake_idx].dir;
+  if (d == Stopped or d == Up) {
+    switch (a) {
+      case RIGHT: return Right;
+      case LEFT: return Left;
+      case NO_OP: return Up;
+    }
+  } else if (d == Down) {
+    switch (a) {
+      case RIGHT: return Left;
+      case LEFT: return Right;
+      case NO_OP: return Down;
+    }
+  } else if (d == Left) {
+    switch (a) {
+      case RIGHT: return Up;
+      case LEFT: return Down;
+      case NO_OP: return Left;
+    }
+  } else { //right
+    switch (a) {
+      case RIGHT: return Down;
+      case LEFT: return Up;
+      case NO_OP: return Right;
+    }
+  }
+  assert(false);
+  return d;
+}
+
 // todo fix
-std::vector<float> SnakeGameEngine::move(std::vector<Direction> moves){
+std::vector<float> SnakeGameEngine::move(std::vector<Action> moves){
   assert(moves.size() == _snakes.size());
   for (int i = 0; i < int(_snakes.size()); ++i) {
-    set_direction(i, moves[i]);
+    set_direction(i, direction_from_action(i, moves[i]));
   }
   step();
-  std::vector<float> rewards = {1.0};
-  return rewards;
+
+  return _rewards;
 }
 
 void SnakeGameEngine::step(){
   // move each snake 1 step per direction
   for (int snake_idx = 0; snake_idx < _snakes.size(); ++snake_idx) {
     Snake &s = _snakes[snake_idx];
+    _rewards[snake_idx] = 0;
+
     if (not s.alive) continue;
     if (s.dir == Stopped) continue;
 
@@ -159,19 +192,21 @@ void SnakeGameEngine::step(){
     // check out of bounds
     if ((head_x < 0 or head_x >= _width) or (head_y < 0 or head_y >= _height)) {
       clear_snake(s);
+      _rewards[snake_idx] = -1;
       continue;
     }
 
     // check collision
     if ((_board[head_y][head_x] != EMPTY_TILE) and (_board[head_y][head_x] != FRUIT_TILE)) {
       clear_snake(s);
+      _rewards[snake_idx] = -1;
       continue;
     }
 
     // ingest fruit
     bool fruit_eaten = false;
     if (_board[head_y][head_x] == FRUIT_TILE) {
-      _scores[snake_idx] += FRUIT_POINTS;
+      _rewards[snake_idx] = FRUIT_POINTS;
       s.extra_length += FRUIT_EXTRA_LENGTH;
       fruit_eaten = true;
     }
@@ -191,12 +226,12 @@ void SnakeGameEngine::step(){
 
     // paint new head
     std::pair<int,int> head = s.body.front();
-    _board[head.second][head.first] = '0' + snake_idx*2;
+    _board[head.second][head.first] = char(snake_idx*2 + 3);
 
     // turn previous head into body
     const auto &it = std::next(s.body.begin());
     if (it != s.body.end()) {
-      _board[it->second][it->first] = '0' + snake_idx*2 + 1;
+      _board[it->second][it->first] = char(snake_idx*2 + 4);
     }
 
     // add new fruit if eaten

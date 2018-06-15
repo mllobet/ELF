@@ -10,12 +10,6 @@
 using namespace std;
 using namespace std::chrono;
 
-// namespace {
-// // work around bug in ALE.
-// // see Arcade-Learning-Environment/issues/86
-// mutex ALE_GLOBAL_LOCK;
-// }
-
 static long compute_seed(int v) {
   auto now = system_clock::now();
   auto now_ms = time_point_cast<milliseconds>(now);
@@ -109,7 +103,7 @@ void SnakeGame::MainLoop(const std::atomic_bool& done) {
       int frame_skip = distr_frame_skip(g);
       _last_reward = 0;
       for (int j = 0; j < frame_skip; ++j) {
-          _last_reward += _snake->move(vector<Direction>(1,_action_set.at(act)))[0];
+          _last_reward += _snake->move(vector<Action>(1,_action_set.at(act)))[0];
       }
       _summary.Feed(_last_reward);
     }

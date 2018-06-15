@@ -10,16 +10,17 @@
 #include <string>
 #include <iostream>
 
-extern char EMPTY_TILE;
-extern char FRUIT_TILE;
+extern unsigned char EMPTY_TILE;
+extern unsigned char FRUIT_TILE;
 
-extern int FRUIT_POINTS;
+extern float FRUIT_POINTS;
 extern int FRUIT_EXTRA_LENGTH;
 
 extern int dx[];
 extern int dy[];
 
 enum Direction {Stopped, Down, Up, Left, Right};
+enum Action {NO_OP, RIGHT, LEFT};
 
 struct Snake {
   std::list<std::pair<int,int>> body;
@@ -57,25 +58,26 @@ public:
   void step();
   bool game_over();
 
-  const std::vector<std::vector<char>>& get_state();
+  const std::vector<std::vector<unsigned char>>& get_state();
   void get_state_array(std::vector<unsigned char> &dest);
-  std::vector<float> move(std::vector<Direction> moves);
+  std::vector<float> move(std::vector<Action> moves);
 
+  Direction direction_from_action(int snake_idx, Action a);
 
   void print();
   void set_fruit(int x, int y);
   void set_direction(int snake_idx, Direction dir);
   void set_seed(int seed);
 
-  std::vector<std::vector<char>> get_board();
-  std::vector<Direction> get_minimal_action_set();
+  std::vector<std::vector<unsigned char>> get_board();
+  std::vector<Action> get_minimal_action_set();
   int get_episode_frame_number();
 
   std::string to_string();
 private:
-  std::vector<std::vector<char>> _board;
+  std::vector<std::vector<unsigned char>> _board;
   std::vector<Snake> _snakes;
-  std::vector<int> _scores;
+  std::vector<float> _rewards;
 
   std::vector<std::pair<int,int>> corners;
 
