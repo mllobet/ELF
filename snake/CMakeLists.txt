@@ -16,7 +16,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/ ${CMAKE_BINARY_DIR}/vend
 # the python lib
 file(GLOB SOURCES *.cc)
 pybind11_add_module(snake_game ${SOURCES})
-target_link_libraries(snake_game PRIVATE elf ale)
+target_link_libraries(snake_game PRIVATE elf)
 set_target_properties(snake_game
 	PROPERTIES
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")

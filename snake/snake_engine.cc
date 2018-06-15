@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <ctime>
+#include <cassert>
 
 char EMPTY_TILE = '-';
 char FRUIT_TILE = '#';
