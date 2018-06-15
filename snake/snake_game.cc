@@ -73,10 +73,8 @@ void SnakeGame::MainLoop(const std::atomic_bool& done) {
   long seed = compute_seed(_game_idx);
   std::default_random_engine g;
   g.seed(seed);
-  std::cout << "seed: " << seed << std::endl;
   std::uniform_int_distribution<int> distr_start_loc(0, 0);
   std::uniform_int_distribution<int> distr_frame_skip(1, 1);
-  std::cout << "Main Loop Start" << std::endl;
   while (true) {
     _snake->reset();
     _last_reward = 0;

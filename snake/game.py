@@ -110,9 +110,9 @@ class Loader:
 
 
 cmd_line = \
-    "--num_games 1 --batchsize 1 --hist_len 1 --frame_skip 4 --actor_only"
+    "--num_games 64 --batchsize 16 --hist_len 1 --frame_skip 4 --actor_only"
 
-nIter = 100
+nIter = 50000
 elapsed_wait_only = 0
 
 if __name__ == '__main__':
