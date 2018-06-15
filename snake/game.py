@@ -9,7 +9,7 @@
 # File: game.py
 
 import argparse
-import atari_game as atari
+import snake_game as snake
 from collections import Counter
 from datetime import datetime
 import os
@@ -50,10 +50,10 @@ class Loader:
 
     def initialize(self):
         args = self.args
-        co = atari.ContextOptions()
+        co = snake.ContextOptions()
         self.context_args.initialize(co)
 
-        opt = atari.GameOptions()
+        opt = snake.GameOptions()
         opt.frame_skip = args.frame_skip
         opt.rom_file = os.path.join(args.rom_dir, args.rom_file)
         opt.seed = 42
@@ -61,7 +61,7 @@ class Loader:
         opt.hist_len = args.hist_len
         opt.reward_clip = args.reward_clip
 
-        GC = atari.GameContext(co, opt)
+        GC = snake.GameContext(co, opt)
         print("Version: ", GC.Version())
 
         params = GC.GetParams()
@@ -110,9 +110,9 @@ class Loader:
 
 
 cmd_line = \
-    "--num_games 64 --batchsize 16 --hist_len 1 --frame_skip 4 --actor_only"
+    "--num_games 1 --batchsize 1 --hist_len 1 --frame_skip 4 --actor_only"
 
-nIter = 5000
+nIter = 100
 elapsed_wait_only = 0
 
 if __name__ == '__main__':
@@ -164,7 +164,7 @@ if __name__ == '__main__':
         train_count += 1
 
     GC.reg_callback("actor", actor)
-    GC.reg_callback("train", train)
+    # GC.reg_callback("train", train)
 
     reward_dist = Counter()
 

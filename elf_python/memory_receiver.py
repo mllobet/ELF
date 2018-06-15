@@ -257,6 +257,13 @@ class BatchStats:
         self.seq_stats.clear_stats()
 
 
+def clean_encoding(data):
+    new_data = {}
+    for (k,v) in data.items():
+        new_data[k.decode()] = v
+
+    return new_data
+
 def ZMQDecoder(receive_data):
     sender_name, m = receive_data
     if sender_name is None:
@@ -275,6 +282,9 @@ def ZMQDecoder(receive_data):
         return "nopackage"
 
     sender_name = sender_name.bytes
+    m = list(map(clean_encoding, m))
+    # print("len m: {}\nm: {}\n\n\n".format(len(m), m))
+    # raise ValueError("ABORT")
     for data in m:
         data["_sender"] = sender_name
 
@@ -409,4 +419,3 @@ class MemoryReceiver:
         if self.prompt is not None:
             print(self.prompt["on_release_batch"], end="")
             sys.stdout.flush()
-
