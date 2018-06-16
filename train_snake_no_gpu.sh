@@ -1,0 +1,1 @@
+game=./snake/game model=actor_critic_simple model_file=./snake/model python3 train.py --batchsize 5 --freq_update 1 --num_games 16 --tqdm --trainer_stats rewards --additional_labels id,last_terminal --keys_in_reply V,rv

@@ -20,7 +20,7 @@ class Model_ActorCritic(Model):
         # relu_func = nn.ReLU
 
         self.trunk = nn.Sequential(
-            nn.Conv2d(3 * params["hist_len"], 32, 5, padding = 2),
+            nn.Conv2d(3*params["hist_len"], 32, 5, padding = 2),
             relu_func(),
             nn.MaxPool2d(2, 2),
             nn.Conv2d(32, 32, 5, padding = 2),
@@ -46,7 +46,8 @@ class Model_ActorCritic(Model):
     def forward(self, x):
         # Get the last hist_len frames.
         s = self._var(x["s"])
-        # print("input size = " + str(s.size()))
+        print("\n\ninput size = " + str(s.size()) + "\n\n")
+        # raise ValueError("HELP")
         rep = self.trunk(s)
         # print("trunk size = " + str(rep.size()))
         rep = self.conv2fc(rep.view(-1, self.linear_dim))
@@ -54,7 +55,46 @@ class Model_ActorCritic(Model):
         value = self.value_branch(rep)
         return dict(pi=policy, V=value)
 
+class Model_ActorCriticSimple(Model):
+    def __init__(self, args):
+        super(Model_ActorCriticSimple, self).__init__(args)
+
+        params = args.params
+
+        self.linear_dim = 1152
+        relu_func = lambda : nn.LeakyReLU(0.1)
+        # relu_func = nn.ReLU
+
+        self.trunk = nn.Sequential(
+            nn.Conv2d(params["hist_len"], 16, 3),
+            relu_func(),
+            nn.Conv2d(16, 32, 3),
+            relu_func()
+        )
+
+        self.conv2fc = nn.Sequential(
+            nn.Linear(self.linear_dim, 512),
+            nn.PReLU()
+        )
+
+        self.policy_branch = nn.Linear(512, params["num_action"])
+        self.value_branch = nn.Linear(512, 1)
+        self.softmax = nn.Softmax()
+
+    def forward(self, x):
+        # Get the last hist_len frames.
+        s = self._var(x["s"])
+        print("\n\ninput size = " + str(s.size()) + "\n\n")
+        # raise ValueError("HELP")
+        rep = self.trunk(s)
+        print("\n\ntrunk size = " + str(rep.size()) + "\n\n")
+        rep = self.conv2fc(rep.view(-1, self.linear_dim))
+        policy = self.softmax(self.policy_branch(rep))
+        value = self.value_branch(rep)
+        return dict(pi=policy, V=value)
+
 # Format: key, [model, method]
 Models = {
-    "actor_critic" : [Model_ActorCritic, ActorCritic]
+    "actor_critic" : [Model_ActorCritic, ActorCritic],
+    "actor_critic_simple" : [Model_ActorCriticSimple, ActorCritic]
 }

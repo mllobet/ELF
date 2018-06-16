@@ -33,7 +33,7 @@ struct GameState {
     char last_terminal = 0;
 
     // This is the board.
-    std::vector<unsigned char> s;
+    std::vector<float> s;
     int32_t tick = 0;
     float last_r = 0.0; // reward of last action
 
