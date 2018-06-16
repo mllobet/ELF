@@ -60,7 +60,7 @@ void SnakeGameEngine::setup_game() {
     int y = int(indices[i]/_width);
 
     _snakes[i] = Snake(x,y);
-    _board[y][x] = char(2*i);
+    _board[y][x] = char(2*i + 3);
   }
 
   // add random fruit
