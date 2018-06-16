@@ -46,10 +46,10 @@ void SnakeGameSummary::Print() const {
 SnakeGame::SnakeGame(const GameOptions& opt)
   : _h(opt.hist_len), _reward_clip(opt.reward_clip), _eval_only(opt.eval_only) {
   // lock_guard<mutex> lg(ALE_GLOBAL_LOCK);
-  _snake.reset(new SnakeGameEngine(8,8,1));
+  _snake.reset(new SnakeGameEngine(10,10,1));
   long seed = compute_seed(opt.seed);
   // _snake->set_seed(int(seed));
-  _snake->set_seed(int(36688269));
+  _snake->set_seed(int(seed));
   // TODO: _snake->setInt("frame_skip", opt.frame_skip);
 
   // TODO: get state, refactor board access

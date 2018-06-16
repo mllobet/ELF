@@ -84,10 +84,9 @@ class Model_ActorCriticSimple(Model):
     def forward(self, x):
         # Get the last hist_len frames.
         s = self._var(x["s"])
-        print("\n\ninput size = " + str(s.size()) + "\n\n")
-        # raise ValueError("HELP")
+        # print("\n\ninput size = " + str(s.size()) + "\n\n")
         rep = self.trunk(s)
-        print("\n\ntrunk size = " + str(rep.size()) + "\n\n")
+        # print("\n\ntrunk size = " + str(rep.size()) + "\n\n")
         rep = self.conv2fc(rep.view(-1, self.linear_dim))
         policy = self.softmax(self.policy_branch(rep))
         value = self.value_branch(rep)

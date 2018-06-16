@@ -15,8 +15,8 @@
 #include "elf/hist.h"
 #include "elf/copier.hh"
 
-static constexpr int kWidth = 8;
-static constexpr int kHeight = 8;
+static constexpr int kWidth = 10;
+static constexpr int kHeight = 10;
 static constexpr int kBufSize = kWidth*kHeight; // removed the 3(RGB) channels here
 // static constexpr int kInputStride = kBufSize / kRatio / kRatio;
 // static constexpr int kWidthRatio = kWidth / kRatio;
